@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Medical Reminder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #38bdf8 0%, #0b1120 40%, #020617 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  color: #f9fafb;
+}
+.app {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 32px;
+  padding: 18px;
+  background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.3), rgba(15, 23, 42, 0.98));
+  box-shadow:
+    0 28px 60px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(22px);
+}
+.app-inner {
+  border-radius: 26px;
+  padding: 18px 18px 14px;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
+  box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.08);
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 18px;
+  background: conic-gradient(from 160deg, #22c55e, #22c55e, #22d3ee, #38bdf8, #22c55e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-inner {
+  width: 26px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fefce8, #fbbf24);
+  transform: rotate(-18deg);
+}
+.title h1 {
+  font-size: 19px;
+  letter-spacing: .02em;
+}
+.title span {
+  font-size: 11px;
+  color: #9ca3af;
+}
+.badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.96));
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+  animation: pulseDot 1.6s infinite;
+}
+.badge span {
+  color: #e5e7eb;
+}
+.card {
+  border-radius: 20px;
+  padding: 14px 14px 10px;
+  background: linear-gradient(155deg, rgba(15, 23, 42, 0.99), rgba(15, 23, 42, 0.9));
+  box-shadow:
+    inset 0 0 0 1px rgba(51, 65, 85, 0.7),
+    0 12px 26px rgba(15, 23, 42, 0.9);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.card-header h2 {
+  font-size: 13px;
+  font-weight: 500;
+}
+.card-header span {
+  font-size: 11px;
+  color: #9ca3af;
+}
+form {
+  margin: 0;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 10px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field label {
+  font-size: 11px;
+  color: #d1d5db;
+}
+.field input[type="text"],
+.field input[type="time"] {
+  border-radius: 14px;
+  border: 1px solid rgba(71, 85, 105, 0.9);
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.97), rgba(15, 23, 42, 0.93));
+  padding: 9px 11px;
+  font-size: 13px;
+  color: #f9fafb;
+  outline: none;
+  transition: border .18s, box-shadow .18s, transform .08s;
+}
+.field input::placeholder {
+  color: #6b7280;
+}
+.field input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.55);
+  transform: translateY(-1px);
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform .08s, box-shadow .18s, background .2s;
+  white-space: nowrap;
+}
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #020617;
+  box-shadow:
+    0 10px 22px rgba(56, 189, 248, 0.75),
+    0 1px 0 rgba(248, 250, 252, 0.28);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(56, 189, 248, 0.9);
+}
+.btn-secondary {
+  padding-inline: 12px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
+  color: #e5e7eb;
+  border: 1px solid rgba(75, 85, 99, 0.95);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.95);
+}
+.btn-secondary:hover {
+  transform: translateY(-1px);
+}
+.btn-icon {
+  font-size: 15px;
+}
+.list-wrap {
+  margin-top: 14px;
+}
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.list-head span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+.count-pill {
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  color: #e5e7eb;
+}
+.list {
+  max-height: 210px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  border-radius: 16px;
+  background: radial-gradient(circle at top left, rgba(30, 64, 175, 0.48), rgba(15, 23, 42, 0.96));
+  box-shadow:
+    0 10px 22px rgba(15, 23, 42, 0.95),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+  margin-bottom: 6px;
+}
+.item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.item-index {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+.item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.item-msg {
+  font-size: 13px;
+}
+.item-time {
+  font-size: 11px;
+  color: #bfdbfe;
+}
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.8);
+  color: #e0f2fe;
+}
+.icon-btn {
+  border-radius: 999px;
+  border: none;
+  padding: 4px 7px;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .08s, box-shadow .16s, background .2s;
+}
+.edit-btn {
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), rgba(15, 23, 42, 0.95));
+  color: #bfdbfe;
+  border: 1px solid rgba(59, 130, 246, 0.7);
+}
+.edit-btn:hover {
+  transform: translateY(-0.5px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.6);
+}
+.delete-btn {
+  background: radial-gradient(circle at top left, rgba(239, 68, 68, 0.18), rgba(15, 23, 42, 0.95));
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.7);
+}
+.delete-btn:hover {
+  transform: translateY(-0.5px);
+  box-shadow: 0 8px 20px rgba(248, 113, 113, 0.6);
+}
+.empty {
+  font-size: 12px;
+  color: #6b7280;
+  padding: 10px 4px 4px;
+  text-align: center;
+}
+.footer {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #9ca3af;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.footer-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+  animation: pulseDot 1.6s infinite;
+}
+@keyframes pulseDot {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 9px rgba(34, 197, 94, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+@media (max-width: 520px) {
+  .app {
+    max-width: 100%;
+    margin: 12px;
+    border-radius: 26px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-inner">
+    <div class="header">
+      <div class="brand">
+        <div class="icon">
+          <div class="icon-inner"></div>
+        </div>
+        <div class="title">
+          <h1>MedReminder</h1>
+          <span>Clean, simple medicine alerts</span>
+        </div>
+      </div>
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span>Active</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>New reminder</h2>
+        <span>24-hour time, eg. 14:45</span>
+      </div>
+      <form method="POST" action="{{ url_for('index') }}">
+        <input type="hidden" id="editIdInput" name="edit_id">
+        <div class="form-grid">
+          <div class="field">
+            <label for="medicineInput">Medicine / note</label>
+            <input id="medicineInput" name="medicine" type="text" placeholder="Vitamin D tablet">
+          </div>
+          <div class="field">
+            <label for="timeInput">Time</label>
+            <input id="timeInput" name="time" type="time">
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-icon">➕</span>
+            <span id="addBtnText">Add reminder</span>
+          </button>
+          <button type="button" class="btn btn-secondary" id="clearBtn">
+            <span class="btn-icon">⟲</span>
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="list-wrap">
+      <div class="list-head">
+        <span>Your reminders</span>
+        <span class="count-pill"><span id="countSpan">{{ reminders|length }}</span> total</span>
+      </div>
+      <div class="list">
+        {% if reminders %}
+          {% for r in reminders %}
+          <div class="item reminder-row"
+               data-id="{{ r.id }}"
+               data-medicine="{{ r.medicine }}"
+               data-time="{{ r.time }}">
+            <div class="item-main">
+              <div class="item-index">{{ loop.index }}</div>
+              <div class="item-text">
+                <div class="item-msg">{{ r.medicine }}</div>
+                <div class="item-time">At {{ r.time }}</div>
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="chip">{{ r.time }}</div>
+              <button type="button" class="icon-btn edit-btn" onclick="startEditReminder({{ r.id }})">✏️</button>
+              <form method="POST" action="{{ url_for('delete', reminder_id=r.id) }}">
+                <button type="submit" class="icon-btn delete-btn">✕</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty">No reminders yet. Add one above.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-time">
+        <div class="footer-dot"></div>
+        <span id="clockSpan">Current time: --:--:--</span>
+      </div>
+      <div>Alarm: popup + beep</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let remindersData = [];
+
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours();
+  let m = now.getMinutes();
+  let s = now.getSeconds();
+  if (h < 10) h = "0" + h;
+  if (m < 10) m = "0" + m;
+  if (s < 10) s = "0" + s;
+  document.getElementById("clockSpan").textContent = "Current time: " + h + ":" + m + ":" + s;
+}
+
+function getCurrentTimeHHMM() {
+  const now = new Date();
+  let h = now.getHours();
+  let m = now.getMinutes();
+  if (h < 10) h = "0" + h;
+  if (m < 10) m = "0" + m;
+  return h + ":" + m;
+}
+
+function initRemindersFromDOM() {
+  remindersData = [];
+  document.querySelectorAll(".reminder-row").forEach(function(row) {
+    const id = parseInt(row.getAttribute("data-id"));
+    const medicine = row.getAttribute("data-medicine") || "";
+    const time = row.getAttribute("data-time") || "";
+    if (time) {
+      remindersData.push({ id: id, medicine: medicine, time: time, fired: false });
+    }
+  });
+}
+
+function beep() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) {
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = 1000;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + 0.01);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+      osc.stop(ctx.currentTime + 1.05);
+    }
+  } catch (e) {}
+}
+
+function beepAndAlert(reminder) {
+  beep();
+  alert("Medicine time\n\n" + reminder.medicine + " at " + reminder.time);
+}
+
+function checkReminders() {
+  const now = getCurrentTimeHHMM();
+  remindersData.forEach(function(r) {
+    if (!r.fired && r.time && typeof r.time === "string") {
+      const target = r.time.slice(0, 5);
+      if (target === now) {
+        r.fired = true;
+        beepAndAlert(r);
+      }
+    }
+  });
+}
+
+function startEditReminder(id) {
+  const reminder = remindersData.find(function(r) { return r.id === id; });
+  if (!reminder) return;
+  document.getElementById("medicineInput").value = reminder.medicine;
+  document.getElementById("timeInput").value = reminder.time;
+  document.getElementById("editIdInput").value = id;
+  document.getElementById("addBtnText").textContent = "Update reminder";
+}
+
+function clearForm() {
+  document.getElementById("medicineInput").value = "";
+  document.getElementById("timeInput").value = "";
+  document.getElementById("editIdInput").value = "";
+  document.getElementById("addBtnText").textContent = "Add reminder";
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("clearBtn").addEventListener("click", function(e) {
+    e.preventDefault();
+    clearForm();
+  });
+  initRemindersFromDOM();
+  updateClock();
+  setInterval(updateClock, 1000);
+  setInterval(checkReminders, 1000);
+});
+</script>
+</body>
+</html>
